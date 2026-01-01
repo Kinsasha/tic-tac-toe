@@ -1,14 +1,3 @@
-const game = (() => {
-  const playerOne = document.createElement("p");
-  const playerTwo = document.createElement("p");
-
-  const playerOneInput = document.getElementById("player1");
-  const playerTwoInput = document.getElementById("player2");
-
-  // playerOne.textContent = playerOneInput.value;
-  // playerTwo.textContent = playerTwoInput.value;
-})();
-
 const gameboard = (() => {
   const board = [];
   const boardContainer = document.querySelector(".board-container");
@@ -16,26 +5,104 @@ const gameboard = (() => {
   const playerNames = document.querySelector(".player-names-board");
   const playerOne = document.querySelector(".playerOne");
   const playerTwo = document.querySelector(".playerTwo");
+  const statusText = document.querySelector(".statusText");
+  const resetBtn = document.querySelector(".resetBtn");
+  const winnerPattern = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  let currentPlayer = "X";
+  let roundWon = false;
+  // const cellBtn = cells;
 
   for (let i = 0; i < 9; i++) {
     const cells = document.createElement("button");
     cells.className = "cells";
     cells.dataset.index = i;
+    // cells.textContent = "X";
 
     board.push(cells);
-
-    // console.log(board);
   }
 
   const playRound = () => {
     boardContainer.addEventListener("click", (e) => {
       const selectedIndex = e.target.dataset.index;
+      let selectedCell = e.target;
+
+      if (selectedCell.textContent !== "") return;
+
+      selectedCell.textContent = currentPlayer;
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+      if (currentPlayer === "X") {
+        statusText.textContent = `${displayController.players[0]}'s turn`;
+      } else if (currentPlayer === "O") {
+        statusText.textContent = `${displayController.players[1]}'s turn`;
+      }
 
       if (selectedIndex === undefined) return;
 
-      console.log(`you clicked ${selectedIndex}`);
+      checkWinner();
     });
   };
+
+  function checkWinner() {
+    const options = board.map((cell) => cell.textContent);
+
+    for (let i = 0; i < winnerPattern.length; i++) {
+      const pattern = winnerPattern[i];
+
+      const cellA = options[pattern[0]];
+      const cellB = options[pattern[1]];
+      const cellC = options[pattern[2]];
+
+      if (cellA == "" || cellB == "" || cellC == "") {
+        continue;
+      }
+      if (cellA === cellB && cellB === cellC) {
+        roundWon = true;
+      }
+      if (!options.includes("")) {
+        statusText.textContent = `Draw!!!`;
+        board.forEach((cell) => (cell.disabled = true));
+      }
+      if (roundWon === true) {
+        const winningCell = cellC;
+        printWinner(winningCell);
+        break;
+      }
+    }
+    function printWinner(x) {
+      let player = displayController.players;
+
+      if (x === "X") {
+        statusText.textContent = `${player[0]} wins`;
+      } else if (x === "O") {
+        statusText.textContent = `${player[1]} wins`;
+      }
+
+      board.forEach((cell) => (cell.disabled = true));
+    }
+
+    resetBtn.addEventListener("click", () => {
+      board.forEach((cell) => {
+        cell.textContent = "";
+        cell.disabled = false;
+      });
+
+      currentPlayer = "X";
+      statusText.textContent = `${displayController.players[0]}'s turn`;
+      roundWon = false;
+    });
+
+    // let indexContent = cells.dataset.index;
+  }
 
   const render = () => {
     board.forEach((cell) => {
@@ -45,28 +112,30 @@ const gameboard = (() => {
       // playerContainer.style.display = "grid"; //to be moved to displaycontroller module
       container.style.display = "none";
       playerNames.style.display = "grid";
+      statusText.style.display = "block";
+      resetBtn.style.display = "block";
       playerOne.textContent = displayController.players[0];
       playerTwo.textContent = displayController.players[1];
+      statusText.textContent = `${displayController.players[0]}'s turn`;
+      checkWinner();
     });
   };
 
-  return { render, playRound };
+  return { render, playRound, checkWinner };
 })();
 
 const displayController = (() => {
-  const playerContainer = document.querySelector(".player-names");
   const playerOne = document.querySelector(".player1");
   const playerTwo = document.querySelector(".player2");
   const enterBtns = document.querySelectorAll(".enter");
-  const inputs = document.querySelectorAll(".input");
   const startBtn = document.querySelector(".start-button");
   const players = [];
 
   enterBtns.forEach((btn) => {
-    btn.addEventListener("click", storePlayerName);
+    btn.addEventListener("click", getPlayer);
   });
 
-  function storePlayerName(e) {
+  function getPlayer(e) {
     const parent = e.target.closest("label");
     const input = parent.querySelector(".input");
     const name = input.value.trim();
@@ -103,7 +172,6 @@ const displayController = (() => {
       return;
     }
 
-    // Update display safely
     playerOne.textContent = players[0];
     playerTwo.textContent = players[1];
 
@@ -115,13 +183,36 @@ const displayController = (() => {
   const startGame = () => {
     if (players.length < 2) return alert("ENTER BOTH PLAYER NAMES FIRST");
     gameboard.render();
+    gameboard.playRound();
   };
   startBtn.addEventListener("click", startGame);
   return {
-    storePlayerName,
+    getPlayer,
     startGame,
     players,
   };
 })();
-displayController.storePlayerName;
+
+// const getPlayerName = (() => {
+//   displayController.startGame;
+//   const getPlayers = displayController.players;
+//   console.log(getPlayers);
+//   let currentPlayer;
+//   if (getPlayers.length === 0)
+//     if (getPlayers.length !== 0) {
+//       currentPlayer = getPlayers[0];
+//     }
+//   const changePlayer = () => {
+//     currentPlayer === getPlayers[0] ? getPlayers[1] : getPlayers[0];
+//     console.log(currentPlayer);
+//   };
+
+//   return {
+//     changePlayer,
+//     getPlayers,
+//   };
+// })();
+// displayController.getPlayer;
 // displayController.startGame;
+// gameboard.render();
+// getPlayerName.changePlayer();

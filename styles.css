@@ -2,6 +2,8 @@ body {
   padding: 0;
   margin: 0;
   font-size: 62.5%;
+  font-family: Roboto, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 .container {
   display: grid;
@@ -23,7 +25,8 @@ p {
   justify-self: center;
   /* border: 1px solid black; */
 }
-.enter {
+.enter,
+.resetBtn {
   display: block;
   padding: 1rem;
   margin: 0.5rem auto;
@@ -41,18 +44,27 @@ p {
 .board-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   height: 60vh;
   width: 50vw;
-  margin: 6rem auto;
-  border-radius: 4px;
+  margin: 1rem auto;
   /* border: 1px solid black; */
 }
 .cells {
   border: 1px solid black;
+  font-size: 4rem;
+  padding: 0;
+  margin: 0;
 }
 .player-names,
 .player-names-board {
   display: grid;
   grid-auto-flow: column;
   /* border: 1px solid black; */
+}
+.player-names-board {
+  margin-top: -2rem;
+}
+.resetBtn {
+  margin-top: -3rem;
 }
